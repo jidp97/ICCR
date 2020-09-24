@@ -16,6 +16,6 @@ jobs:
         dotnet-version: 3.1
         # publishes Blazor project to the release-folder
     - name: Publish .NET Core Project
-      run: dotnet publish LaugamaCorp.csproj -c Release -o release --nologo 
+      run: dotnet publish ICCR.csproj -c Release -o release --nologo 
 
 
