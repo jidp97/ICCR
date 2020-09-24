@@ -1,0 +1,169 @@
+﻿@inject HttpClient http
+<EditForm Model="@Articulos" OnValidSubmit="@OnValidSubmit">
+    <div class="form-group">
+        <label>Articulo:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="Articulos.Articulo" />
+            <ValidationMessage For="(() => Articulos.Articulo)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Categoria:</label>
+        <div>
+            <InputSelectNumber class="form-control"
+                               @bind-Value="Articulos.CategoriaId">
+                <option value="0">--Seleccione una categoria--</option>
+                @foreach (var item in Categorias)
+                {
+                    @if (item.Id == Articulos.CategoriaId)
+                    {
+                        <option selected value="@item.Id">@item.Nombre</option>
+                    }
+                    else
+                    {
+                        <option value="@item.Id">@item.Nombre</option>
+                    }
+
+                }
+            </InputSelectNumber>
+            <ValidationMessage For="(() => Articulos.Categoria)" />
+        </div>
+    </div>
+    @if (Articulos.Codigo != null)
+    {
+        <div class="form-group">
+            <label>Codigo:</label>
+            <div>
+                <InputText class="form-control" @bind-Value="Articulos.Codigo" />
+                <ValidationMessage For="(() => Articulos.Codigo)" />
+            </div>
+        </div>
+    }
+
+
+
+    <div class="form-group">
+        <label>Precio:</label>
+        <div>
+            <InputNumber class="form-control" @bind-Value="Articulos.Precio" />
+            <ValidationMessage For="(() => Articulos.Precio)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Precio de reposicion:</label>
+        <div>
+            <InputNumber class="form-control" @oninput="OnPriceChanged" @bind-Value="Articulos.PrecioReposicion" />
+            <ValidationMessage For="(() => Articulos.PrecioReposicion)" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Precio de alquiler:</label>
+        <div>
+            <InputNumber class="form-control" @oninput="OnPriceChangedAlquiler" @bind-Value="Articulos.PrecioAlquiler" />
+            <ValidationMessage For="(() => Articulos.PrecioAlquiler)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Cantidad:</label>
+        <div>
+            <InputNumber class="form-control" @bind-Value="Articulos.Cantidad" />
+            <ValidationMessage For="(() => Articulos.Cantidad)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Imagen:</label>
+        <div>
+            <InputFile OnChange="HandleSelection"></InputFile>
+            @if (Articulos.Imagen != null)
+            {
+                <div>
+
+                    @*<img src="C:\Users\Jose Ismael\Desktop\ICCR\src\LaugamaCorp.Server\upload\@Articulos.Imagen" style="width:300px" />*@
+                </div>
+                @*<img src="/Images/images.jpg" />*@
+                <img src="/upload/images.jpg" />
+            }
+            <p>@status</p>
+
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Suplidor:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="Articulos.Suplidor" />
+            <ValidationMessage For="(() => Articulos.Suplidor)" />
+        </div>
+    </div>
+    @if (Articulos.FechaRegistro.Year > 2001)
+    {
+        <div class="form-group">
+            <label>Fecha:</label>
+            <div>
+                <InputDate class="form-control" @bind-Value="Articulos.FechaRegistro" />
+                <ValidationMessage For="(() => Articulos.FechaRegistro)" />
+            </div>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-success">@TextBoton</button>
+    <DataAnnotationsValidator />
+</EditForm>
+
+    @code {
+        [Parameter] public Producto Articulos { get; set; } = new Producto();
+        [Parameter] public String TextBoton { get; set; } = "Salvar cambios";
+        [Parameter] public EventCallback OnValidSubmit { get; set; }
+        [Parameter]
+        public EventCallback<decimal> PriceChanged { get; set; }
+        public EventCallback<decimal> PriceChangedAlquiler { get; set; }
+        List<Categoria> Categorias = new List<Categoria>();
+        decimal precio;
+        decimal precioAlquiler;
+        string status;
+
+
+
+        protected override async Task OnInitializedAsync()
+        {
+
+
+            Categorias = await http.GetJsonAsync<List<Categoria>>("categorias/lista");
+        }
+
+
+        private Task OnPriceChanged(ChangeEventArgs e)
+        {
+            e.Value = Articulos.Precio * (decimal)3.00;
+            Articulos.PrecioReposicion = (decimal)e.Value;
+            precio = Articulos.PrecioReposicion;
+            return PriceChanged.InvokeAsync(precio);
+        }
+        private Task OnPriceChangedAlquiler(ChangeEventArgs e)
+        {
+            e.Value = Articulos.Precio / (decimal)3.00;
+            Articulos.PrecioAlquiler = (decimal)e.Value;
+            precioAlquiler = Articulos.PrecioAlquiler;
+            return PriceChanged.InvokeAsync(precioAlquiler);
+        }
+
+        public async Task HandleSelection(IFileListEntry[] files)
+        {
+            var file = files.FirstOrDefault();
+            if (file != null)
+            {
+                var ms = new MemoryStream();
+                await file.Data.CopyToAsync(ms);
+
+                status = $"Upload {file.Size} bytes from {file.Name}";
+
+                var content = new MultipartFormDataContent
+                {
+                    { new ByteArrayContent(ms.GetBuffer()),"\"upload\"",file.Name}
+                };
+                Articulos.Imagen = file.Name;
+                await http.PostAsync("upload", content);
+            }
+        }
+
+    }

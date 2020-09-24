@@ -1,0 +1,51 @@
+﻿@page "/editar-usuario/{UserId}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@using System.Timers;
+<h3>Actualizar datos</h3>
+
+@if (usuario != null)
+{
+
+    <FormularioUsuarios TextBoton="Guardar cambios" OnValidSubmit="@EditarUsuario" Usuario="@usuario" />
+
+}
+
+
+
+@*<p>No nos está mandando ni pinga</p>*@
+
+
+
+
+
+@code {
+    [Parameter] public string UserId { get; set; }
+
+    UsuarioDTO usuario;
+
+    protected async override Task OnParametersSetAsync()
+    {
+
+        if (usuario == null)
+        {
+            await JS.CargarAsync();
+        }
+
+        usuario = await Http.GetJsonAsync<UsuarioDTO>($"api/usuarios/{UserId}/obtenerUsuario");
+
+        if (usuario != null)
+        {
+            await JS.RemoveAsync();
+        }
+
+    }
+
+    async Task EditarUsuario()
+    {
+        await Http.PutJsonAsync("api/usuarios", usuario);
+        await JS.RegistroEditadoAsync();
+        NavigationManager.NavigateTo("usuarios");
+    }
+}

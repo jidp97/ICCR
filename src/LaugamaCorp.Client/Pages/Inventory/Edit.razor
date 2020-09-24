@@ -1,0 +1,30 @@
+﻿@page "/editar-articulo/{IdArticulo:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime js
+<h3>Actualizar datos</h3>
+@if (inventory != null)
+{
+    <FormularioArticulos TextBoton="Guardar cambios" OnValidSubmit="@EditarArticulo" Articulos="@inventory" />
+
+}
+
+
+
+@code {
+    [Parameter] public int IdArticulo { get; set; }
+    Producto inventory;
+
+    protected async override Task OnParametersSetAsync()
+    {
+        inventory = await Http.GetJsonAsync<Producto>($"inventory/{IdArticulo}");
+    }
+
+    async Task EditarArticulo()
+    {
+        await Http.PutJsonAsync("inventory", inventory);
+        await js.RegistroEditadoAsync();
+        NavigationManager.NavigateTo("indice-articulos");
+        
+    }
+}

@@ -1,0 +1,21 @@
+﻿@inject HttpClient http
+
+<EditForm Model="@Categorias" OnValidSubmit="@OnValidSubmit">
+    <div class="form-group">
+        <label>Articulo:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="Categorias.Nombre" />
+            <ValidationMessage For="(() => Categorias.Nombre)" />
+        </div>
+    </div>
+  
+    <button type="submit" class="btn btn-success">@TextBoton</button>
+    <DataAnnotationsValidator />
+</EditForm>
+
+    @code {
+        [Parameter] public Categoria Categorias { get; set; } = new Categoria();
+        [Parameter] public String TextBoton { get; set; } = "Salvar cambios";
+        [Parameter] public EventCallback OnValidSubmit { get; set; }       
+      
+    }

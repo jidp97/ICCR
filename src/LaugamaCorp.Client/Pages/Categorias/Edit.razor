@@ -1,0 +1,29 @@
+﻿@page "/editar-categoria/{IdCategoria:int}"
+@inject HttpClient Http
+@inject IJSRuntime js
+@inject NavigationManager NavigationManager
+<h3>Actualizar datos</h3>
+@if (categoriaS != null)
+{
+    <FormularioCategorias TextBoton="Guardar cambios" OnValidSubmit="@EditarCategoria" Categorias="@categoriaS" />
+
+}
+
+
+
+@code {
+    [Parameter] public int IdCategoria { get; set; }
+    Categoria categoriaS;
+
+    protected async override Task OnParametersSetAsync()
+    {
+        categoriaS = await Http.GetJsonAsync<Categoria>($"categorias/{IdCategoria}");
+    }
+
+    async Task EditarCategoria()
+    {
+        await Http.PutJsonAsync("categorias", categoriaS);
+        await js.RegistroEditadoAsync();
+        NavigationManager.NavigateTo("indice-categorias");
+    }
+}

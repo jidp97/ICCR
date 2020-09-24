@@ -1,0 +1,17 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@page "/crear-persona"
+<h3>Crear</h3>
+
+<FormularioPersonas TextBoton="Crear Persona" OnValidSubmit="@CrearPersona" Persona="@persona"/>
+
+@code {
+    Persona persona = new Persona();
+
+    async Task CrearPersona()
+    {
+        await Http.PostJsonAsync("Personas", persona);
+        NavigationManager.NavigateTo("indice-personas");
+    }
+
+}

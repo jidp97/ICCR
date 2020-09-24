@@ -1,0 +1,108 @@
+﻿@page "/usuarios"
+@inject IRepositorio repositorio
+@inject IJSRuntime JS
+@*@inject IMostrarMensajes mostrarMensajes*@
+    <AuthorizeView Policy="@Policies.IsAdmin">
+        <h3>Indice Usuarios</h3>
+
+
+        <a class="btn btn-info" href="Register">Agregar nuevo usuario</a>
+        <ListadoGenerico2 Listado="Usuarios">
+            <HayRegistrosCompleto>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Nombre</th>
+                            <th>Cargo</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var usuario in Usuarios)
+                        {
+                            <tr>
+
+                                <td>
+                                    @usuario.Email
+                                </td>
+                                <td>
+                                    @usuario.FirtName @usuario.LastName
+                                </td>
+                                <td>
+                                    @usuario.Cargo
+                                </td>
+                                <td>
+                                    <a href="/usuarios/editar/@usuario.UserId" class="btn btn-info">Asignar role</a>
+                                    <a href="editar-usuario/@usuario.UserId" class="btn btn-success">Editar</a>
+                                    <button class="btn btn-danger" @onclick="(() => BorrarUsuario(usuario.UserId))">Borrar</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </HayRegistrosCompleto>
+        </ListadoGenerico2>
+        <Pagination PaginaActual="paginaActual" PaginaSeleccionada="paginaSeleccionada"
+                    PaginasTotales="paginasTotales"></Pagination>
+    </AuthorizeView>
+
+
+@code {
+    List<UsuarioDTO> Usuarios;
+
+    private int paginaActual = 1;
+    private int paginasTotales;
+
+    private async Task paginaSeleccionada(int pagina)
+    {
+        paginaActual = pagina;
+        await Cargar(pagina);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Cargar();
+    }
+
+    private async Task Cargar(int pagina = 1)
+    {
+        if (Usuarios == null)
+        {
+            await JS.CargarAsync();
+        }
+        var httpResponse = await repositorio.Get<List<UsuarioDTO>>($"api/usuarios?pagina={pagina}");
+
+        if (httpResponse.Error)
+        {
+            Console.WriteLine("Error");
+        }
+        else
+        {
+            paginasTotales = int.Parse(httpResponse.HttpResponseMessage.Headers.GetValues("totalPaginas").FirstOrDefault());
+            Usuarios = httpResponse.Response;
+        }
+        if (Usuarios.Count >= 0)
+        {
+            await JS.RemoveAsync();
+        }
+        if (Usuarios.Count <= 0)
+        {
+            await JS.EmptyDbNotifyAsync();
+        }
+    }
+
+     async Task BorrarUsuario(string idUsuario)
+    {
+
+        var personaSeleccionada = Usuarios.First(x => x.UserId == idUsuario);
+        string mensajeConfirmacion = $"Realmente deseas borrar a {personaSeleccionada.FirtName}?";
+        if (await JS.ConfirmAsync("Confirmar", mensajeConfirmacion, TipoMensajeSweetAlert.question))
+        {
+            await repositorio.Delete($"api/usuarios/{idUsuario}");
+            await Cargar();
+        }
+
+    }
+
+}

@@ -1,0 +1,45 @@
+﻿<EditForm Model="Usuario" OnValidSubmit="@OnValidSubmit">
+    <div class="form-group">
+        <label>ID:</label>
+        <div>
+            <InputText readonly class="form-control"  @bind-Value="Usuario.UserId" />
+            <ValidationMessage For="(() => Usuario.UserId)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Email:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="Usuario.Email" />
+            <ValidationMessage For="(() => Usuario.Email)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Nombre:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="Usuario.FirtName" />
+            <ValidationMessage For="(() => Usuario.FirtName)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Apellido:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="Usuario.LastName" />
+            <ValidationMessage For="(() => Usuario.LastName)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Cargo:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="Usuario.Cargo" />
+            <ValidationMessage For="(() => Usuario.Cargo)" />
+        </div>
+    </div>
+    <button type="submit" class="btn btn-success">@TextBoton</button>
+    <DataAnnotationsValidator />
+</EditForm>
+
+@code {
+        [Parameter] public UsuarioDTO Usuario { get; set; } = new UsuarioDTO();
+        [Parameter] public String TextBoton { get; set; } = "Salvar cambios";
+        [Parameter] public EventCallback OnValidSubmit { get; set; }
+}

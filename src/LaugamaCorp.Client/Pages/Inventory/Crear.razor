@@ -1,0 +1,19 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@page "/agregar-articulo"
+<h3>Agregar articulo</h3>
+
+<FormularioArticulos TextBoton="Agregar articulo" OnValidSubmit="@AgregarArticulo" Articulos="inventory"/>
+
+@code {
+    Producto inventory = new Producto();
+
+    async Task AgregarArticulo()
+    {
+        await Http.PostJsonAsync("Inventory", inventory);
+        await JS.RegistroAgregadoAsync();
+        NavigationManager.NavigateTo("indice-articulos");
+    }
+
+}

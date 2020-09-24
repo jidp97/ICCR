@@ -1,0 +1,13 @@
+﻿@page "/"
+
+<h1>Hola!</h1>
+
+<p>Esta pagina se encuentra en desarrollo.</p>
+
+<AuthorizeView Policy="@Policies.IsUser">
+    <p>Solo ves esto si eres un usuario ordinario.</p>
+</AuthorizeView>
+
+<AuthorizeView Policy="@Policies.IsAdmin">
+    <p>Solo ves esto si eres un administrador.</p>
+</AuthorizeView>
