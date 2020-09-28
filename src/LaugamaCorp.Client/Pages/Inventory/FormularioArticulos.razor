@@ -1,4 +1,5 @@
 ﻿@inject HttpClient http
+@inject IJSRuntime JS
 <EditForm Model="@Articulos" OnValidSubmit="@OnValidSubmit">
     <div class="form-group">
         <label>Articulo:</label>
@@ -60,7 +61,7 @@
     <div class="form-group">
         <label>Precio de alquiler:</label>
         <div>
-            <InputNumber class="form-control" @oninput="OnPriceChangedAlquiler" @bind-Value="Articulos.PrecioAlquiler" />
+            <InputNumber class="form-control" @oninput="OnPriceChangedAlquiler"  @bind-Value="Articulos.PrecioAlquiler" />
             <ValidationMessage For="(() => Articulos.PrecioAlquiler)" />
         </div>
     </div>
@@ -74,20 +75,93 @@
     <div class="form-group">
         <label>Imagen:</label>
         <div>
-            <InputFile OnChange="HandleSelection"></InputFile>
-            @if (Articulos.Imagen != null)
-            {
-                <div>
+           
+            <div class="file-input theme-fas">
+                <div class="file-preview">
+                    <button type="button" class="close fileinput-remove" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    @if (Articulos.Imagen == null)
+                    {
+                        <div class=" file-drop-zone clearfix" dropzone="true">
+                            <div class="file-drop-zone-title">Drag &amp; drop files here …</div>
+                            <div class="file-preview-thumbnails clearfix"></div>
+                            <div class="file-preview-status text-center text-success"></div>
+                            <div class="kv-fileinput-error file-error-message" style="display: none;"></div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="file-drop-zone clearfix">
+                            <div class="file-preview-thumbnails clearfix">
+                                <div class="file-preview-frame krajee-default  kv-preview-thumb" id="thumb-file-1-5572_images.jpg" data-fileindex="-1" data-fileid="5572_images.jpg" data-template="image">
+                                    <div class="kv-file-content">
+                                        <img src="/upload/@Articulos.Imagen" style="width: auto; height: auto; max-width: 100%; max-height: 100%; image-orientation: from-image;" />
+                                    </div>
+                                    <div class="file-thumbnail-footer">
+                                        <div class="file-footer-caption" title="@Articulos.Imagen">
+                                            <div class="file-caption-info">@Articulos.Imagen</div>
+                                            @*<div class="file-size-info"> <samp>@file.Size bytes</samp></div>*@
+                                        </div>
+                                        <div class="file-thumb-progress kv-hidden">
+                                            <div class="progress">
+                                                <div class="progress-bar bg-info progress-bar-info progress-bar-striped active progress-bar-animated" role="progressbar" aria-valuenow="101" aria-valuemin="0" aria-valuemax="100" style="width: 101%;">
+                                                    Initializing …
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="file-upload-indicator" title="Not uploaded yet"><i class="fas fa-plus-circle text-warning"></i></div>
+                                        <div class="file-actions">
+                                            <div class="file-footer-buttons">
+                                                <button type="button" class="kv-file-upload btn btn-sm btn-kv btn-default btn-outline-secondary" title="Upload file"><i class="fas fa-upload"></i></button> <button type="button" class="kv-file-remove btn btn-sm btn-kv btn-default btn-outline-secondary" title="Remove file"><i class="fas fa-trash-alt"></i></button>
+                                                <button type="button" class="kv-file-zoom btn btn-sm btn-kv btn-default btn-outline-secondary" title="View Details"><i class="fas fa-search-plus"></i></button>
+                                            </div>
+                                        </div>
 
-                    @*<img src="C:\Users\Jose Ismael\Desktop\ICCR\src\LaugamaCorp.Server\upload\@Articulos.Imagen" style="width:300px" />*@
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="file-preview-status text-center text-success"></div>
+                            <div class="kv-fileinput-error file-error-message" style="display: none;"></div>
+                        </div>
+                    }
+
                 </div>
-                @*<img src="/Images/images.jpg" />*@
-                <img src="/upload/images.jpg" />
-            }
-            <p>@status</p>
+                <div class="kv-upload-progress kv-hidden" style="display: none;">
+                    <div class="progress">
+                        <div class="progress-bar bg-success progress-bar-success progress-bar-striped active progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                            0%
+                        </div>
+                    </div>
+                </div><div class="clearfix"></div>
+                <div class="input-group file-caption-main">
+                    <div class="file-caption form-control kv-fileinput-caption icon-visible" tabindex="500">
+                        <span class="file-caption-icon"><i class="fas fa-file kv-caption-icon"></i> </span>
+                        <input class="file-caption-name" placeholder="Seleccionar archivo" value="@Articulos.Imagen">
+                    </div>
+                    <div class="input-group-btn input-group-append">
+                        @if (Articulos.Imagen != null)
+                        {
+                            <button type="button" class="btn btn-primary">subir imagen</button>
+                            <button type="button" tabindex="500" title="Clear all unprocessed files" class="btn btn-default btn-secondary fileinput-remove fileinput-remove-button"><i class="fas fa-trash-alt"></i>  <span class="hidden-xs">Remove</span></button>
+                            <button type="button" tabindex="500" title="Abort ongoing upload" class="btn btn-default btn-secondary kv-hidden fileinput-cancel fileinput-cancel-button" style="display: none;"><i class="fas fa-ban"></i>  <span class="hidden-xs">Cancel</span></button>
+                        }
 
+
+
+                        <div tabindex="500" class="btn btn-primary btn-file">
+                            <i class="fas fa-folder-open"></i>  <span class="hidden-xs">Subir imagen…</span>
+                            <InputFile id="file-4" type="file" class="file" data-upload-url="#" data-theme="fas" OnChange="HandleSelection"></InputFile>
+                        </div>
+                    </div>
+                </div>
+            </div>
+         
         </div>
     </div>
+    <hr>
+
     <div class="form-group">
         <label>Suplidor:</label>
         <div>
@@ -110,60 +184,68 @@
     <DataAnnotationsValidator />
 </EditForm>
 
-    @code {
-        [Parameter] public Producto Articulos { get; set; } = new Producto();
-        [Parameter] public String TextBoton { get; set; } = "Salvar cambios";
-        [Parameter] public EventCallback OnValidSubmit { get; set; }
-        [Parameter]
-        public EventCallback<decimal> PriceChanged { get; set; }
-        public EventCallback<decimal> PriceChangedAlquiler { get; set; }
-        List<Categoria> Categorias = new List<Categoria>();
-        decimal precio;
-        decimal precioAlquiler;
-        string status;
+
+@code {
+    [Parameter] public Producto Articulos { get; set; } = new Producto();
+    [Parameter] public String TextBoton { get; set; } = "Salvar cambios";
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+    [Parameter]
+    public EventCallback<decimal> PriceChanged { get; set; }
+    public EventCallback<decimal> PriceChangedAlquiler { get; set; }
+    List<Categoria> Categorias = new List<Categoria>();
+    decimal precio;
+    decimal precioAlquiler;
+    string status;
+    IFileListEntry file;
+    
 
 
-
-        protected override async Task OnInitializedAsync()
-        {
-
-
-            Categorias = await http.GetJsonAsync<List<Categoria>>("categorias/lista");
-        }
+    protected override async Task OnInitializedAsync()
+    {
 
 
-        private Task OnPriceChanged(ChangeEventArgs e)
-        {
-            e.Value = Articulos.Precio * (decimal)3.00;
-            Articulos.PrecioReposicion = (decimal)e.Value;
-            precio = Articulos.PrecioReposicion;
-            return PriceChanged.InvokeAsync(precio);
-        }
-        private Task OnPriceChangedAlquiler(ChangeEventArgs e)
-        {
-            e.Value = Articulos.Precio / (decimal)3.00;
-            Articulos.PrecioAlquiler = (decimal)e.Value;
-            precioAlquiler = Articulos.PrecioAlquiler;
-            return PriceChanged.InvokeAsync(precioAlquiler);
-        }
-
-        public async Task HandleSelection(IFileListEntry[] files)
-        {
-            var file = files.FirstOrDefault();
-            if (file != null)
-            {
-                var ms = new MemoryStream();
-                await file.Data.CopyToAsync(ms);
-
-                status = $"Upload {file.Size} bytes from {file.Name}";
-
-                var content = new MultipartFormDataContent
-                {
-                    { new ByteArrayContent(ms.GetBuffer()),"\"upload\"",file.Name}
-                };
-                Articulos.Imagen = file.Name;
-                await http.PostAsync("upload", content);
-            }
-        }
-
+        Categorias = await http.GetJsonAsync<List<Categoria>>("categorias/lista");
     }
+
+
+    private Task OnPriceChanged(ChangeEventArgs e)
+    {
+        e.Value = Articulos.Precio * (decimal)3.00;
+        Articulos.PrecioReposicion = (decimal)e.Value;
+        precio = Articulos.PrecioReposicion;
+        return PriceChanged.InvokeAsync(precio);
+    }
+    private Task OnPriceChangedAlquiler(ChangeEventArgs e)
+    {
+        e.Value = Articulos.Precio / (decimal)3.00;
+        Articulos.PrecioAlquiler = (decimal)e.Value;
+        precioAlquiler = Articulos.PrecioAlquiler;
+        return PriceChanged.InvokeAsync(precioAlquiler);
+    }
+
+    public async Task HandleSelection(IFileListEntry[] files)
+    {
+        file = files.FirstOrDefault();
+        if (file != null)
+        {
+            Articulos.Imagen = file.Name;
+            var ms = new MemoryStream();
+            await file.Data.CopyToAsync(ms);
+
+            status = $"Se subieron {file.Size} bytes del archivo llamado {file.Name}";
+
+            var content = new MultipartFormDataContent
+            {
+                    { new ByteArrayContent(ms.GetBuffer()),"\"upload\"",file.Name}
+            };
+
+                await JS.NotiflixSuccessAsync(status);
+                await http.PostAsync("upload", content);
+            
+
+
+
+        }
+    }
+
+}

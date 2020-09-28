@@ -54,6 +54,10 @@ namespace LaugamaCorp.Client.Helpers
         {
             return await js.InvokeAsync<object>("RegistroAgregado");
         }
+        public static async Task<object> NotiflixSuccessAsync(this IJSRuntime js, string mensaje)
+        {
+            return await js.InvokeAsync<object>("NotiflixSuccess", mensaje);
+        }
     }
 
     public enum TipoMensajeSweetAlert

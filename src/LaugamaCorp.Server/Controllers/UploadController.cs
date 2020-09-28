@@ -26,6 +26,7 @@ namespace LaugamaCorp.Server.Controllers
                 foreach (var file in HttpContext.Request.Form.Files)
                 {
                     var path = Path.Combine(_enviroment.ContentRootPath, "upload", file.FileName);
+                  
                     using (var stream = new FileStream(path, FileMode.Create))
                     {
                         await file.CopyToAsync(stream);

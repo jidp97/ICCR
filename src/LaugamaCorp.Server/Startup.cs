@@ -12,6 +12,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
 using System.Text;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 namespace LaugamaCorp.Server
 {
@@ -84,6 +86,14 @@ namespace LaugamaCorp.Server
 
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseStaticFiles();
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                Path.Combine(Directory.GetCurrentDirectory(), "upload" )),
+                RequestPath = "/upload"
+            });
 
             app.UseEndpoints(endpoints =>
             {
