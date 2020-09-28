@@ -42,7 +42,8 @@ namespace LaugamaCorp.Server.Controllers
                 }
             }
             await HttpContext.InsertarParametrosPaginacionEnRespuesta(queryable, pagination.CantidadAMostrar);
-            return await queryable.Include(x=> x.Categoria).Paginar(pagination).ToListAsync();
+            return await queryable.Include(x=> x.Categoria)
+                .Include(x=> x.Suplidor).Paginar(pagination).ToListAsync();
 
         }
         [HttpGet("{id}", Name = "obtenerArticulo")]
@@ -119,7 +120,10 @@ namespace LaugamaCorp.Server.Controllers
             {
                 articulo.PrecioAlquiler = articulo.Precio / (decimal)3.00;
             }
-
+            if(articulo.SuplidorId == 0)
+            {
+                articulo.SuplidorId = 4;
+            }
           
             articulo.FechaRegistro = DateTime.Now;            
             _context.Add(articulo);

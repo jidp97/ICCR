@@ -1,0 +1,19 @@
+﻿@inject HttpClient Http
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@page "/agregar-suplidor"
+<h3>Agregar suplidor</h3>
+
+<FormularioSuplidores TextBoton="Agregar suplidor" OnValidSubmit="@AgregarSuplidor" Suplidores="suplidor"/>
+
+@code {
+    Suplidor suplidor = new Suplidor();
+
+    async Task AgregarSuplidor()
+    {
+        await Http.PostJsonAsync("suplidores", suplidor);
+        await JS.RegistroAgregadoAsync();
+        NavigationManager.NavigateTo("indice-suplidores");
+    }
+
+}

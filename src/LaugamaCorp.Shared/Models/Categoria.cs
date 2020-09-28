@@ -11,6 +11,5 @@ namespace LaugamaCorp.Shared.Models
         public string Nombre { get; set; }
 
 
-
     }
 }

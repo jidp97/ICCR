@@ -14,12 +14,14 @@ namespace LaugamaCorp.Shared.Models
         
         [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar una categoria")]
         public int CategoriaId { get; set; }
+
         public Categoria Categoria { get; set; }
-        //public List<Categoria> Categorias { get; set; }
-        public string Suplidor { get; set; }
+        [Range(0, int.MaxValue, ErrorMessage = "Debe especificar el suplidor de este artículo")]
+        public int SuplidorId { get; set; }
+
+        public Suplidor Suplidor { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Debe especificar la cantidad")]
-        public int Cantidad { get; set; }
-       
+        public int Cantidad { get; set; }   
         public decimal PrecioAlquiler { get; set; }
         public string Imagen { get; set; }
         public decimal Precio { get; set; }

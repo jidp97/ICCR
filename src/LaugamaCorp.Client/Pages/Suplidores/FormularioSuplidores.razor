@@ -1,0 +1,37 @@
+﻿@inject HttpClient http
+
+<EditForm Model="@Suplidores" OnValidSubmit="@OnValidSubmit">
+    <div class="form-group">
+        <label>Suplidor:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="Suplidores.Nombre" />
+            <ValidationMessage For="(() => Suplidores.Nombre)" />
+        </div>
+        <label>RNC:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="Suplidores.RNC" />
+            <ValidationMessage For="(() => Suplidores.RNC)" />
+        </div>
+        <label>Telefono:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="Suplidores.Telefono" />
+            <ValidationMessage For="(() => Suplidores.Telefono)" />
+        </div>
+        <label>Dirección:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="Suplidores.Direccion" />
+            <ValidationMessage For="(() => Suplidores.Direccion)" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">@TextBoton</button>
+    <DataAnnotationsValidator />
+</EditForm>
+
+@code {
+    [Parameter] public Suplidor Suplidores { get; set; } = new Suplidor();
+    [Parameter] public String TextBoton { get; set; } = "Salvar cambios";
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+
+}
+

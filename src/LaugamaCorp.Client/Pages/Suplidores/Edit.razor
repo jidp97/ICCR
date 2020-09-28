@@ -1,0 +1,28 @@
+﻿@page "/editar-suplidor/{IdSuplidor:int}"
+@inject HttpClient Http
+@inject IJSRuntime js
+@inject NavigationManager NavigationManager
+<h3>Actualizar datos</h3>
+@if (suplidor != null)
+{
+    <FormularioSuplidores TextBoton="Guardar cambios" OnValidSubmit="@EditarSuplidor" Suplidores="@suplidor" />
+
+}
+
+
+@code {
+    [Parameter] public int IdSuplidor { get; set; }
+    Suplidor suplidor;
+
+    protected async override Task OnParametersSetAsync()
+    {
+        suplidor = await Http.GetJsonAsync<Suplidor>($"suplidores/{IdSuplidor}");
+    }
+
+    async Task EditarSuplidor()
+    {
+        await Http.PutJsonAsync("suplidores", suplidor);
+        await js.RegistroEditadoAsync();
+        NavigationManager.NavigateTo("indice-suplidores");
+    }
+}

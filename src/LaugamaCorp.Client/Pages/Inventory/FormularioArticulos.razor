@@ -27,7 +27,7 @@
 
                 }
             </InputSelectNumber>
-            <ValidationMessage For="(() => Articulos.Categoria)" />
+            <ValidationMessage For="(() => Articulos.CategoriaId)" />
         </div>
     </div>
     @if (Articulos.Codigo != null)
@@ -40,9 +40,6 @@
             </div>
         </div>
     }
-
-
-
     <div class="form-group">
         <label>Precio:</label>
         <div>
@@ -57,7 +54,6 @@
             <ValidationMessage For="(() => Articulos.PrecioReposicion)" />
         </div>
     </div>
-
     <div class="form-group">
         <label>Precio de alquiler:</label>
         <div>
@@ -161,12 +157,27 @@
         </div>
     </div>
     <hr>
-
     <div class="form-group">
         <label>Suplidor:</label>
         <div>
-            <InputText class="form-control" @bind-Value="Articulos.Suplidor" />
-            <ValidationMessage For="(() => Articulos.Suplidor)" />
+            <InputSelectNumber class="form-control"
+                               @bind-Value="Articulos.SuplidorId">
+                <option value="0">--Seleccione un suplidor--</option>
+
+                @foreach (var item in Suplidores)
+                {
+                    @if (item.Id == Articulos.SuplidorId)
+                    {
+                        <option selected value="@item.Id">@item.Nombre</option>
+                    }
+                    else
+                    {
+                        <option value="@item.Id">@item.Nombre</option>
+                    }
+
+                }
+            </InputSelectNumber>
+            @*<ValidationMessage For="(() => Articulos.SuplidorId)" />*@
         </div>
     </div>
     @if (Articulos.FechaRegistro.Year > 2001)
@@ -193,18 +204,18 @@
     public EventCallback<decimal> PriceChanged { get; set; }
     public EventCallback<decimal> PriceChangedAlquiler { get; set; }
     List<Categoria> Categorias = new List<Categoria>();
+    List<Suplidor> Suplidores = new List<Suplidor>();
     decimal precio;
     decimal precioAlquiler;
     string status;
     IFileListEntry file;
-    
+
 
 
     protected override async Task OnInitializedAsync()
     {
-
-
         Categorias = await http.GetJsonAsync<List<Categoria>>("categorias/lista");
+        Suplidores = await http.GetJsonAsync<List<Suplidor>>("suplidores/lista");
     }
 
 
@@ -239,9 +250,9 @@
                     { new ByteArrayContent(ms.GetBuffer()),"\"upload\"",file.Name}
             };
 
-                await JS.NotiflixSuccessAsync(status);
-                await http.PostAsync("upload", content);
-            
+            await JS.NotiflixSuccessAsync(status);
+            await http.PostAsync("upload", content);
+
 
 
 

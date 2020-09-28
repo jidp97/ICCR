@@ -29,5 +29,6 @@ namespace LaugamaCorp.Server.Data
         public DbSet<Producto> Inventory { get; set; }
 
         public DbSet<Categoria> Categorias { get; set; }
+        public DbSet<Suplidor> Suplidores { get; set; }
     }
 }

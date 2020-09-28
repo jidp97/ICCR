@@ -28,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Migations\" />
     <Folder Include="upload\" />
   </ItemGroup>
 
