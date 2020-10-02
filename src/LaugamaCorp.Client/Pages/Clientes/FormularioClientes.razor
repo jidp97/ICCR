@@ -1,0 +1,260 @@
+﻿@inject HttpClient http
+@inject IJSRuntime JS
+<EditForm Model="@Clientes" OnValidSubmit="@OnValidSubmit">
+    <div class="form-group">
+        <label>Seleccione el tipo de cliente que desea agregar:</label>
+        @foreach (var item in new string[] { "Persona física", "Empresa privada", "Institución pública" })
+        {
+            <div>
+                <input type="radio" id="@item" value="@item" @onchange="RadioSelection" checked=@(RadioValue.Equals(item,StringComparison.OrdinalIgnoreCase)) />
+                <label for="@item">@item</label>
+            </div>
+        }
+    </div>
+    @switch (Clientes.TipoCliente)
+    {
+        case "Persona física":
+            <div class="form-group">
+                <label>Nombre:</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="Clientes.Nombre" />
+                    <ValidationMessage For="(() => Clientes.Nombre)" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Apellido:</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="Clientes.Apellido" />
+                    <ValidationMessage For="(() => Clientes.Apellido)" />
+                </div>
+            </div>
+            <label>Tipo de Documento:</label>
+            foreach (var item in new string[] { "Cédula", "Pasaporte" })
+            {
+                <div>
+                    <input type="radio" id="@item" value="@item" @onchange="RadioSelectionTD" checked=@(RadioTipoDocumento.Equals(item,StringComparison.OrdinalIgnoreCase)) />
+                    <label for="@item">@item</label>
+                </div>
+            }
+
+            switch (Clientes.TipoIdentificacion)
+            {
+                case "Cédula":
+                    <div class="form-group">
+                        <label>Cédula:</label>
+                        <div>
+                            <InputMask @ref="mask" class="form-control" data-mask="000-0000000-0" maxlength="13" minlenghth="13" @bind-Value="Clientes.Identificacion" />
+                            <ValidationMessage For="(() => Clientes.Identificacion)" />
+                        </div>
+                    </div>
+                    break;
+                case "Pasaporte":
+                    <div class="form-group">
+                        <label>Pasaporte:</label>
+                        <div>
+                            <InputText class="form-control" @bind-Value="Clientes.Identificacion" />
+                            <ValidationMessage For="(() => Clientes.Identificacion)" />
+                        </div>
+                    </div>
+                    break;
+
+            }
+            <div class="form-group">
+                <label>Correo electrónico:</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="Clientes.Correo" />
+                    <ValidationMessage For="(() => Clientes.Correo)" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Teléfono:</label>
+                <div>
+                    <InputMask @ref="mask" class="form-control" data-mask="(000)-000-0000" @bind-Value="Clientes.Telefono" />
+                    <ValidationMessage For="(() => Clientes.Telefono)" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Dirección:</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="Clientes.Location" />
+                    <ValidationMessage For="(() => Clientes.Location)" />
+                </div>
+            </div>
+            <div class="form-group">
+                <InputCheckbox @bind-Value="descuento"></InputCheckbox>
+                <label>Desea establecer un porcentaje de descuento predeterminado para este cliente?</label>
+            </div>
+            @if (descuento)
+            {
+                <div class="form-group">
+                    <label>Descuento preferencial:</label>
+                    <div>
+                        <InputNumber class="form-control" @bind-Value="Clientes.Descuento" />
+                        <ValidationMessage For="(() => Clientes.Descuento)" />
+                    </div>
+                </div>
+
+            }
+
+
+            break;
+        case "Empresa privada":
+            <div class="form-group">
+                <label>Nombre de la empresa:</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="Clientes.Nombre" />
+                    <ValidationMessage For="(() => Clientes.Nombre)" />
+                </div>
+            </div>
+            foreach (var item in new string[] { "Cédula", "Pasaporte", "RNC" })
+            {
+                if (Clientes.TipoCliente != "Persona física")
+                {
+                    if (item.Contains("RNC"))
+                    {
+                        <div hidden>
+                            <input type="radio" id="@item" value="@item" @onchange="RadioSelectionTD" checked/>
+                            <label for="@item">@item</label>
+                        </div>
+                        <ValidationMessage For="(() => Clientes.TipoIdentificacion)" />
+                    }
+
+                }
+                else
+                {
+                    <div>
+                        <input type="radio" id="@item" value="@item" @onchange="RadioSelectionTD" checked=@(RadioTipoDocumento.Equals(item,StringComparison.OrdinalIgnoreCase)) />
+                        <label for="@item">@item</label>
+                    </div>
+                }
+
+            }
+            <div class="form-group">
+                <label>RNC:</label>
+                <div>
+                    <InputMask @ref="mask" class="form-control" data-mask="0-00-00000-0" @bind-Value="Clientes.Identificacion" />
+                    <ValidationMessage For="(() => Clientes.Identificacion)" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Correo electrónico:</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="Clientes.Correo" />
+                    <ValidationMessage For="(() => Clientes.Correo)" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Teléfono:</label>
+                <div>
+                    <InputMask @ref="mask" class="form-control" data-mask="(000)-000-0000" @bind-Value="Clientes.Telefono" />
+                    <ValidationMessage For="(() => Clientes.Telefono)" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Dirección:</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="Clientes.Location" />
+                    <ValidationMessage For="(() => Clientes.Location)" />
+                </div>
+            </div>
+            <div class="form-group">
+                <InputCheckbox @bind-Value="descuento"></InputCheckbox>
+                <label>Desea establecer un porcentaje de descuento predeterminado para este cliente?</label>
+            </div>
+            @if (descuento)
+            {
+                <div class="form-group">
+                    <label>Descuento preferencial:</label>
+                    <div>
+                        <InputNumber class="form-control" @bind-Value="Clientes.Descuento" />
+                        <ValidationMessage For="(() => Clientes.Descuento)" />
+                    </div>
+                </div>
+
+            }
+
+
+            break;
+        case "Institución pública":
+            <div class="form-group">
+                <label>Nombre de la Institución:</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="Clientes.Nombre" />
+                    <ValidationMessage For="(() => Clientes.Nombre)" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>RNC:</label>
+                <div>
+                    <InputMask @ref="mask" class="form-control" data-mask="0-00-00000-0" @bind-Value="Clientes.Identificacion" />
+                    <ValidationMessage For="(() => Clientes.Nombre)" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Correo electrónico:</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="Clientes.Correo" />
+                    <ValidationMessage For="(() => Clientes.Correo)" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Teléfono:</label>
+                <div>
+                    <InputMask @ref="mask" class="form-control" data-mask="(000)-000-0000" @bind-Value="Clientes.Telefono" />
+                    <ValidationMessage For="(() => Clientes.Telefono)" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Dirección:</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="Clientes.Location" />
+                    <ValidationMessage For="(() => Clientes.Location)" />
+                </div>
+            </div>
+            <div class="form-group">
+                <InputCheckbox @bind-Value="descuento"></InputCheckbox>
+                <label>Desea establecer un porcentaje de descuento predeterminado para este cliente?</label>
+            </div>
+            @if (descuento)
+            {
+                <div class="form-group">
+                    <label>Descuento preferencial:</label>
+                    <div>
+                        <InputNumber class="form-control" @bind-Value="Clientes.Descuento" />
+                        <ValidationMessage For="(() => Clientes.Descuento)" />
+                    </div>
+                </div>
+
+            }
+            break;
+    }
+    <button type="submit" class="btn btn-success">@TextBoton</button>
+    <DataAnnotationsValidator />
+</EditForm>
+
+@code {
+    [Parameter] public Cliente Clientes { get; set; } = new Cliente();
+    [Parameter] public String TextBoton { get; set; } = "Salvar cambios";
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+    bool descuento = false;
+    string RadioValue = String.Empty;
+    string RadioTipoDocumento = "RNC";
+    InputMask mask { get; set; }
+    void RadioSelection(ChangeEventArgs args)
+    {
+
+        RadioValue = args.Value.ToString();
+        Clientes.TipoCliente = RadioValue;
+
+    }
+    void RadioSelectionTD(ChangeEventArgs args)
+    {
+
+        RadioTipoDocumento = args.Value.ToString();
+ 
+            Clientes.TipoIdentificacion = RadioTipoDocumento;
+ 
+
+    }
+}

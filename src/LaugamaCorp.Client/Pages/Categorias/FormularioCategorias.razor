@@ -2,7 +2,7 @@
 
 <EditForm Model="@Categorias" OnValidSubmit="@OnValidSubmit">
     <div class="form-group">
-        <label>Articulo:</label>
+        <label>Categoria:</label>
         <div>
             <InputText class="form-control" @bind-Value="Categorias.Nombre" />
             <ValidationMessage For="(() => Categorias.Nombre)" />

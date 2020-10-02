@@ -9,12 +9,12 @@
         </div>
         <label>RNC:</label>
         <div>
-            <InputText class="form-control" @bind-Value="Suplidores.RNC" />
+            <InputMask @ref="mask" class="form-control" data-mask="0-00-00000-0" @bind-Value="Suplidores.RNC" />
             <ValidationMessage For="(() => Suplidores.RNC)" />
         </div>
         <label>Telefono:</label>
         <div>
-            <InputText class="form-control" @bind-Value="Suplidores.Telefono" />
+             <InputMask @ref="mask" class="form-control" data-mask="(000)-000-0000" @bind-Value="Suplidores.Telefono" />
             <ValidationMessage For="(() => Suplidores.Telefono)" />
         </div>
         <label>Dirección:</label>
@@ -32,6 +32,7 @@
     [Parameter] public Suplidor Suplidores { get; set; } = new Suplidor();
     [Parameter] public String TextBoton { get; set; } = "Salvar cambios";
     [Parameter] public EventCallback OnValidSubmit { get; set; }
+    InputMask mask { get; set; }
 
 }
 

@@ -1,0 +1,19 @@
+﻿@inject HttpClient Http
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@page "/agregar-cliente"
+<h3>Agregar nuevo cliente</h3>
+<br />
+<FormularioClientes TextBoton="Agregar cliente" OnValidSubmit="@AgregarCliente" Clientes="cliente"/>
+
+@code {
+    Cliente cliente = new Cliente();
+
+    async Task AgregarCliente()
+    {
+        await Http.PostJsonAsync("clientes", cliente);
+        await JS.RegistroAgregadoAsync();
+        NavigationManager.NavigateTo("indice-clientes");
+    }
+
+}

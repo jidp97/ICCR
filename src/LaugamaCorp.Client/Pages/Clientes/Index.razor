@@ -1,0 +1,204 @@
+﻿@page "/indice-clientes"
+@inject HttpClient Http
+@inject IJSRuntime JS
+@using System.IO
+@using CsvHelper
+@using System.Text.Json
+
+<style>
+    .btn-blazor {
+        background-color: #2e0e4e;
+        color: white;
+    }
+
+   
+    .thead-blazor {
+        background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+        color: aliceblue;
+    }
+
+    .page-item.active .page-link {
+        z-index: 1;
+        color: #fff;
+        background-color: #2e0e4e;
+        border-color: #2e0e4e;
+    }
+
+    .page-link {
+        position: relative;
+        display: block;
+        padding: .5rem .75rem;
+        margin-left: -1px;
+        line-height: 1.25;
+        color: #2e0e4e;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-top-color: rgb(222, 226, 230);
+        border-right-color: rgb(222, 226, 230);
+        border-bottom-color: rgb(222, 226, 230);
+        border-left-color: rgb(222, 226, 230);
+    }
+
+        .page-link:hover {
+            z-index: 2;
+            color: #2c0b4d;
+            text-decoration: none;
+            background-color: #46174173;
+            border-color: #dee2e6;
+        }
+</style>
+<h3>Clientes</h3>
+<div id="bar"></div>
+
+<div>
+    <a class="btn btn-blazor" href="agregar-cliente">Crear nuevo cliente</a>
+</div>
+
+<div class="form-inline justify-content-end">
+    <label class="sr-only" for="nombre-filtro">Filtrar</label>
+    <input type="text" class="form-control mb-2 mr-sm-2"
+           @onchange="Writting" oninput="(this.dispatchEvent(new CustomEvent('change', {bubbles: true})))" placeholder="Filtrar cliente" />
+</div>
+
+
+<div>
+    <ListadoGenerico Listado="clientes">
+        <PlantillaNula>
+            @*<div class="caja"></div>*@
+        </PlantillaNula>
+        <PlantillaVacia>
+            <text>No existen clientes actualmente</text>
+        </PlantillaVacia>
+        <PlantillaConElementos>
+            <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                <table class="table">
+                    <thead class="thead-blazor">
+                        <tr>
+                            
+                            <th>Nombre</th>
+                            <th>Mail</th>
+                            <th>Teléfono</th>
+                            <th>Tipo de documento</th>
+                            <th>Documento de identificación</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       @foreach (var cliente in clientes)
+                        {
+                        <tr>
+                            
+
+                            @if (cliente.Apellido != null)
+                            {
+                            <td>
+                                @cliente.Nombre @cliente.Apellido
+                            </td>
+                            }
+                            else
+                            {
+                                <td>@cliente.Nombre</td>
+                            }
+                            <td>@cliente.Correo</td>
+                            <td>@cliente.Telefono</td>
+                            <td>@cliente.TipoIdentificacion</td>
+                            <td>@cliente.Identificacion</td>
+
+                            <td>
+                                <a class="btn btn-success" href="editar-cliente/@cliente.Id">Editar</a>
+                                <AuthorizeView Policy="@Policies.IsAdmin">
+                                    <button class="btn btn-danger" @onclick="(() => BorrarCliente(cliente.Id))">Borrar</button>
+                                </AuthorizeView>
+
+
+                            </td>
+
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @*<button class="btn btn-success" @onclick="ExportarCSV">Exportar a CSV</button>*@
+        </PlantillaConElementos>
+    </ListadoGenerico>
+</div>
+<Pagination PaginasTotales="paginasTotales" PaginaActual="paginaActual" PaginaSeleccionada="PaginaSeleccionada"></Pagination>
+
+@code {
+    List<Cliente> clientes { get; set; }
+    // Estado estados;
+
+    private int paginaActual = 1;
+    private int paginasTotales;
+    private string nombreCategoriaFiltro = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await CargarClientes();
+
+    }
+
+
+    private async Task PaginaSeleccionada(int pagina)
+    {
+        paginaActual = pagina;
+        await CargarClientes(pagina);
+    }
+
+    async Task Writting(ChangeEventArgs args)
+    {
+        string values = args.Value.ToString();
+        nombreCategoriaFiltro = values;
+        await CargarClientes();
+    }
+
+
+
+    async Task CargarClientes(int pagina = 1, int cantidadRegistrosAMostrar = 10)
+    {
+
+        if (clientes == null)
+        {
+            await JS.CargarAsync();
+        }
+
+        var httpResponse = await Http.GetAsync($"clientes?Pagina={pagina}&CantidadAMostrar={cantidadRegistrosAMostrar}&nombre={nombreCategoriaFiltro}");
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            paginasTotales = int.Parse(httpResponse.Headers.GetValues("totalPaginas").FirstOrDefault());
+            var responseString = await httpResponse.Content.ReadAsStringAsync();
+            clientes = JsonSerializer.Deserialize<List<Cliente>>(responseString,
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+        }
+        else
+        {
+            Console.WriteLine("error");
+        }
+        //personas = await Http.GetJsonAsync<List<Persona>>("personas");
+        if (clientes.Count >= 0)
+        {
+            await JS.RemoveAsync();
+        }
+        if (clientes.Count <= 0)
+        {
+            await JS.EmptyDbNotifyAsync();
+        }
+
+    }
+
+    async Task BorrarCliente(int idCliente)
+    {
+
+        var categoriaSeleccionada = clientes.First(x => x.Id == idCliente);
+        string mensajeConfirmacion = $"Realmente deseas borrar a {categoriaSeleccionada.Nombre}?";
+        if (await JS.ConfirmAsync("Confirmar", mensajeConfirmacion, TipoMensajeSweetAlert.question))
+        {
+            await Http.DeleteAsync($"clientes/{idCliente}");
+            await CargarClientes();
+        }
+
+    }
+ 
+}

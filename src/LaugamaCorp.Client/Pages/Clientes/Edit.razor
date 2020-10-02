@@ -1,0 +1,29 @@
+﻿@page "/editar-cliente/{IdCliente:int}"
+@inject HttpClient Http
+@inject IJSRuntime js
+@inject NavigationManager NavigationManager
+<h3>Actualizar datos</h3>
+@if (cliente != null)
+{
+    <FormularioClientes2 TextBoton="Guardar cambios" OnValidSubmit="@EditarCliente" Clientes="@cliente" />
+
+}
+
+
+
+@code {
+    [Parameter] public int IdCliente { get; set; }
+    Cliente cliente;
+
+    protected async override Task OnParametersSetAsync()
+    {
+        cliente = await Http.GetJsonAsync<Cliente>($"clientes/{IdCliente}");
+    }
+
+    async Task EditarCliente()
+    {
+        await Http.PutJsonAsync("clientes", cliente);
+        await js.RegistroEditadoAsync();
+        NavigationManager.NavigateTo("indice-clientes");
+    }
+}

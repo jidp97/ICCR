@@ -30,5 +30,6 @@ namespace LaugamaCorp.Server.Data
 
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Suplidor> Suplidores { get; set; }
+        public DbSet<Cliente> Clientes { get; set; }
     }
 }
